@@ -1,9 +1,15 @@
-from tkinter import Tk, Label, Button
+from tkinter import Tk, Label, Button, Text
 
 class GUI:
     def __init__(self,master):
         self.master = master
         self.state = 0
+        self.generation =  [[1, 2, 3, 4, 5, 6, 7],
+                            [1, 2, 3, 4, 5, 6, 7],
+                            [1, 2, 3, 4, 5, 6, 7],
+                            [1, 2, 3, 4, 5, 6, 7],
+                            [1, 2, 3, 4, 5, 6, 7]]
+        self.porcentaje = [100, 90, 80, 70, 60]
         master.title("Proyecto 5")
         master.geometry("550x360")
 
@@ -49,11 +55,12 @@ class GUI:
         self.labelx5 = Label(master, text = "x_5", borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
         self.labelx6 = Label(master, text = "x_6", borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
         
-        self.mejor1 = Label(master, text= "mejor 1", borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
-        self.mejor2 = Label(master, text= "mejor 2", borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
-        self.mejor3 = Label(master, text= "mejor 3", borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
-        self.mejor4 = Label(master, text= "mejor 4", borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
-        self.mejor5 = Label(master, text= "mejor 5", borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
+        self.porcentajeLabel = Label(master, text= "Porcentaje", borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
+        self.porcentaje0 = Label(master, borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
+        self.porcentaje1 = Label(master, borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
+        self.porcentaje2 = Label(master, borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
+        self.porcentaje3 = Label(master, borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
+        self.porcentaje4 = Label(master, borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
 
 
         self.labelv0b0 = Label(master, borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
@@ -96,13 +103,12 @@ class GUI:
         self.labelv5b4 = Label(master, borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
         self.labelv6b4 = Label(master, borderwidth = 2, relief = "ridge", background = "white", width = self.labelWidth, height = self.labelHeight)
 
-
         #Playback buttons
-        self.startButton = Button(master, text = "START", background = "white", width = self.buttonWidth, height = self.buttonHeight)
-        self.stopButton = Button(master, text = "STOP", background = "white", width = self.buttonWidth, height = self.buttonHeight)
-        self.stepButton = Button(master, text = "STEP", background = "white", width = self.buttonWidth, height = self.buttonHeight)
-
-
+        self.startButton = Button(master, text = "COMENZAR", background = "red", width = self.buttonWidth, height = self.buttonHeight)
+        self.genLabel = Label(master, background = "white", width = self.buttonWidth, height = self.buttonHeight)
+        self.genText = Text(master, background = "white", width = self.buttonWidth, height = self.buttonHeight)
+        self.searchButton = Button(master, text = "BUSCAR", background = "white", width = self.buttonWidth, height = self.buttonHeight, command = lambda: self.buscar())
+        self.bestButton = Button(master, text = "MEJOR", background = "yellow", width = self.buttonWidth, height = self.buttonHeight, command = lambda: self.mejor())
 
         #Filler
         self.filler0 = Label(master, width = self.fillerWidth, height = self.fillerHeight)
@@ -116,10 +122,12 @@ class GUI:
         self.button2.grid(row = 2, column = 0)
         self.button3.grid(row = 3, column = 0)
 
-        #Playback Buttons
-        self.startButton.grid(row = 5, column = 0)
-        self.stopButton.grid(row = 6, column = 0)
-        self.stepButton.grid(row = 7, column = 0)
+        #Playback
+        self.startButton.grid(row = 4, column = 0)
+        self.genLabel.grid(row = 5, column = 0)
+        self.genText.grid(row = 6, column = 0)
+        self.searchButton.grid(row = 7, column = 0)
+        self.bestButton.grid(row = 8, column = 0)
 
 
         #Display Filler
@@ -134,11 +142,12 @@ class GUI:
         self.labelx5.grid(row = 6, column = 2)
         self.labelx6.grid(row = 7, column = 2)
 
-        self.mejor1.grid(row = 8, column = 3)
-        self.mejor2.grid(row = 8, column = 4)
-        self.mejor3.grid(row = 8, column = 5)
-        self.mejor4.grid(row = 8, column = 6)
-        self.mejor5.grid(row = 8, column = 7)
+        self.porcentajeLabel.grid(row = 8, column = 2)
+        self.porcentaje0.grid(row = 8, column = 3)
+        self.porcentaje1.grid(row = 8, column = 4)
+        self.porcentaje2.grid(row = 8, column = 5)
+        self.porcentaje3.grid(row = 8, column = 6)
+        self.porcentaje4.grid(row = 8, column = 7)
 
         self.labelv0b0.grid(row = 1, column = 3)
         self.labelv1b0.grid(row = 2, column = 3)
@@ -198,7 +207,139 @@ class GUI:
         self.state = 3
         return
 
+    def actualizar_generacion(self, genTotal):
+        self.genLabel["text"] = genTotal
+        return
 
+    def comenzar(self):
+        #funcion a ejecutar esta en self.state
+        return
+
+    def buscar(self):
+        if (self.genText.get("1.0", "end-1c") == ""):
+            return
+
+        generacion = self.genText.get("1.0", "end-1c")
+
+        #Insertar funcion de buscar generacion
+
+        self.labelv0b0["background"] = "white"
+        self.labelv1b0["background"] = "white"
+        self.labelv2b0["background"] = "white"
+        self.labelv3b0["background"] = "white"
+        self.labelv4b0["background"] = "white"
+        self.labelv5b0["background"] = "white"
+        self.labelv6b0["background"] = "white"
+        self.porcentaje0["background"] = "white"
+
+        self.labelv0b0["text"] = str(self.generation[0][0])
+        self.labelv1b0["text"] = str(self.generation[0][1])
+        self.labelv2b0["text"] = str(self.generation[0][2])
+        self.labelv3b0["text"] = str(self.generation[0][3])
+        self.labelv4b0["text"] = str(self.generation[0][4])
+        self.labelv5b0["text"] = str(self.generation[0][5])
+        self.labelv6b0["text"] = str(self.generation[0][6])
+
+        self.labelv0b1["text"] = str(self.generation[1][0])
+        self.labelv1b1["text"] = str(self.generation[1][1])
+        self.labelv2b1["text"] = str(self.generation[1][2])
+        self.labelv3b1["text"] = str(self.generation[1][3])
+        self.labelv4b1["text"] = str(self.generation[1][4])
+        self.labelv5b1["text"] = str(self.generation[1][5])
+        self.labelv6b1["text"] = str(self.generation[1][6])
+
+        self.labelv0b2["text"] = str(self.generation[2][0])
+        self.labelv1b2["text"] = str(self.generation[2][1])
+        self.labelv2b2["text"] = str(self.generation[2][2])
+        self.labelv3b2["text"] = str(self.generation[2][3])
+        self.labelv4b2["text"] = str(self.generation[2][4])
+        self.labelv5b2["text"] = str(self.generation[2][5])
+        self.labelv6b2["text"] = str(self.generation[2][6])
+
+        self.labelv0b3["text"] = str(self.generation[3][0])
+        self.labelv1b3["text"] = str(self.generation[3][1])
+        self.labelv2b3["text"] = str(self.generation[3][2])
+        self.labelv3b3["text"] = str(self.generation[3][3])
+        self.labelv4b3["text"] = str(self.generation[3][4])
+        self.labelv5b3["text"] = str(self.generation[3][5])
+        self.labelv6b3["text"] = str(self.generation[3][6])
+
+        self.labelv0b4["text"] = str(self.generation[4][0])
+        self.labelv1b4["text"] = str(self.generation[4][1])
+        self.labelv2b4["text"] = str(self.generation[4][2])
+        self.labelv3b4["text"] = str(self.generation[4][3])
+        self.labelv4b4["text"] = str(self.generation[4][4])
+        self.labelv5b4["text"] = str(self.generation[4][5])
+        self.labelv6b4["text"] = str(self.generation[4][6])
+
+        self.porcentaje0["text"] = str(self.porcentaje[0])
+        self.porcentaje1["text"] = str(self.porcentaje[1])
+        self.porcentaje2["text"] = str(self.porcentaje[2])
+        self.porcentaje3["text"] = str(self.porcentaje[3])
+        self.porcentaje4["text"] = str(self.porcentaje[4])
+
+        return
+    
+    def mejor(self):
+
+        #Insertar funcion de buscar generacion
+
+        self.labelv0b0["background"] = "yellow"
+        self.labelv1b0["background"] = "yellow"
+        self.labelv2b0["background"] = "yellow"
+        self.labelv3b0["background"] = "yellow"
+        self.labelv4b0["background"] = "yellow"
+        self.labelv5b0["background"] = "yellow"
+        self.labelv6b0["background"] = "yellow"
+        self.porcentaje0["background"] = "yellow"
+
+        self.labelv0b1["text"] = ""
+        self.labelv1b1["text"] = ""
+        self.labelv2b1["text"] = ""
+        self.labelv3b1["text"] = ""
+        self.labelv4b1["text"] = ""
+        self.labelv5b1["text"] = ""
+        self.labelv6b1["text"] = ""
+
+        self.labelv0b2["text"] = ""
+        self.labelv1b2["text"] = ""
+        self.labelv2b2["text"] = ""
+        self.labelv3b2["text"] = ""
+        self.labelv4b2["text"] = ""
+        self.labelv5b2["text"] = ""
+        self.labelv6b2["text"] = ""
+
+        self.labelv0b3["text"] = ""
+        self.labelv1b3["text"] = ""
+        self.labelv2b3["text"] = ""
+        self.labelv3b3["text"] = ""
+        self.labelv4b3["text"] = ""
+        self.labelv5b3["text"] = ""
+        self.labelv6b3["text"] = ""
+
+        self.labelv0b4["text"] = ""
+        self.labelv1b4["text"] = ""
+        self.labelv2b4["text"] = ""
+        self.labelv3b4["text"] = ""
+        self.labelv4b4["text"] = ""
+        self.labelv5b4["text"] = ""
+        self.labelv6b4["text"] = ""
+
+        self.porcentaje1["text"] = ""
+        self.porcentaje2["text"] = ""
+        self.porcentaje3["text"] = ""
+        self.porcentaje4["text"] = ""
+
+        self.labelv0b0["text"] = str(self.generation[0][0])
+        self.labelv1b0["text"] = str(self.generation[0][1])
+        self.labelv2b0["text"] = str(self.generation[0][2])
+        self.labelv3b0["text"] = str(self.generation[0][3])
+        self.labelv4b0["text"] = str(self.generation[0][4])
+        self.labelv5b0["text"] = str(self.generation[0][5])
+        self.labelv6b0["text"] = str(self.generation[0][6])
+        self.porcentaje0["text"] = str(self.porcentaje[0])
+
+        return
 
 if __name__ == "__main__":
     root = Tk()
